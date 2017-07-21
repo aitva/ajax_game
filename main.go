@@ -1,38 +1,38 @@
 package main
 
 import (
+	"html/template"
 	"log"
 	"net/http"
-
 	"os"
-
-	"strings"
 
 	"github.com/gorilla/handlers"
 )
 
+type server struct {
+	tmpl *template.Template
+}
+
 func main() {
-	log.Println("listening on :8080")
+	var err error
+	s := &server{}
+	s.tmpl, err = template.ParseGlob("template/*.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", indexHandler)
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.HandleFunc("/", s.indexHandler)
 	logHandler := handlers.LoggingHandler(os.Stdout, mux)
+
+	log.Println("listening on :8080")
 	log.Fatal(http.ListenAndServe(":8080", logHandler))
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-
-	headers := ""
-	for k, v := range r.Header {
-		headers += k + ": " + strings.Join(v, ",") + "\n"
+func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
+	err := s.tmpl.ExecuteTemplate(w, "index.html", nil)
+	if err != nil {
+		log.Println("fail to execute template:", err)
 	}
-	w.Write([]byte("HEADERS:\n"))
-	w.Write([]byte(headers + "\n"))
-
-	requestedWith := r.Header.Get("HTTP_X_REQUESTED_WITH")
-	if strings.ToLower(requestedWith) == "xmlhttprequest" {
-		w.Write([]byte("Hello AJAX!"))
-		return
-	}
-	w.Write([]byte("Hello World!"))
 }
