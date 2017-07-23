@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{template "partial/head.html" .}}
+
+<body class="container">
+    {{template "partial/header.html" .}}
+    <div class="row justify-content-md-center mt-2">
+        <p class="col-md-8">Well done, you have just made an HTTP request! An HTTP request always starts with a verb. And by default the browser use the verb <code>GET</code>.</p>
+    </div>
+    <div class="row justify-content-md-center mt-2">
+        <pre class="col-md-8">{{.Request}}</pre>
+    </div>
+</body>
+
+</html>
