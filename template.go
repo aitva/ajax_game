@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 func parseTemplates(folder, ext string) (*template.Template, error) {
@@ -28,4 +30,20 @@ func parseTemplates(folder, ext string) (*template.Template, error) {
 		return err
 	})
 	return t, err
+}
+
+func watchTemplate(folder string) (*fsnotify.Watcher, error) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		return nil, err
+	}
+
+	err = filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			return nil
+		}
+		return watcher.Add(path)
+	})
+
+	return watcher, nil
 }

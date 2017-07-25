@@ -4,10 +4,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"os"
 
-	"net/http/httputil"
-
+	"github.com/fsnotify/fsnotify"
 	"github.com/gorilla/handlers"
 )
 
@@ -34,8 +34,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.indexHandler)
-	mux.HandleFunc("/register/", s.registerHandler)
-	mux.HandleFunc("/template/reload/", s.reloadTemplate)
+	mux.HandleFunc("/http-basics/", s.httpBasicsHandler)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// f, err := os.Create("access.log")
@@ -43,6 +42,10 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 	logHandler := handlers.LoggingHandler(os.Stdout, mux)
+
+	w, err := watchTemplate("template")
+	defer w.Close()
+	go s.reloadTemplate(w)
 
 	log.Println("listening on :8080")
 	log.Fatal(http.ListenAndServe(":8080", logHandler))
@@ -54,7 +57,29 @@ func writeError(w http.ResponseWriter, msg string) {
 	w.Write([]byte(msg))
 }
 
+func (s *server) reloadTemplate(w *fsnotify.Watcher) {
+	for {
+		select {
+		case event := <-w.Events:
+			if event.Op&fsnotify.Write == fsnotify.Write {
+				tmpl, err := parseTemplates("template", ".html")
+				if err != nil {
+					log.Println("fail to load template:", err)
+				}
+				log.Println("template updated")
+				s.tmpl = tmpl
+			}
+		case err := <-w.Errors:
+			log.Println("fail to watch template:", err)
+		}
+	}
+}
+
 func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		s.notFoundHandler(w, r)
+		return
+	}
 	d := &displayHTTP{
 		Title: "AJAX Game",
 		Icon:  "fa-gamepad",
@@ -67,22 +92,10 @@ func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *server) reloadTemplate(w http.ResponseWriter, r *http.Request) {
-	var err error
-	s.tmpl, err = parseTemplates("template", ".html")
-	if err != nil {
-		log.Println("fail to parse template:", err)
-		writeError(w, "Oops, something went wrong... ☹")
-		return
-	}
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Write([]byte("Ready to go!"))
-}
-
-func (s *server) registerHandler(w http.ResponseWriter, r *http.Request) {
+func (s *server) httpBasicsHandler(w http.ResponseWriter, r *http.Request) {
 	d := &displayHTTP{
-		Title: "Register",
-		Icon:  "fa-address-card",
+		Title: "HTTP Basics",
+		Icon:  "fa-coffee",
 	}
 	tmp, err := httputil.DumpRequest(r, true)
 	if err != nil {
@@ -91,7 +104,20 @@ func (s *server) registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	d.Request = string(tmp)
-	err = s.tmpl.ExecuteTemplate(w, "register.html", d)
+	err = s.tmpl.ExecuteTemplate(w, "http-basics.html", d)
+	if err != nil {
+		log.Println("fail to execute template:", err)
+		writeError(w, "Oops, something went wrong... ☹")
+		return
+	}
+}
+
+func (s *server) notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	d := &displayHTTP{
+		Title: "404 - Not Found",
+		Icon:  "fa-eye",
+	}
+	err := s.tmpl.ExecuteTemplate(w, "not-found.html", d)
 	if err != nil {
 		log.Println("fail to execute template:", err)
 		writeError(w, "Oops, something went wrong... ☹")
