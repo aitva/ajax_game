@@ -34,7 +34,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.indexHandler)
-	mux.HandleFunc("/http-basics/", s.httpBasicsHandler)
+	mux.HandleFunc("/http-basics/", s.httpBasicsHandler("http-basics.html", "HTTP Basics", "fa-coffee"))
+	mux.HandleFunc("/http-query/", s.httpBasicsHandler("http-query.html", "HTTP Query", "fa-question"))
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// f, err := os.Create("access.log")
@@ -92,23 +93,25 @@ func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *server) httpBasicsHandler(w http.ResponseWriter, r *http.Request) {
-	d := &displayHTTP{
-		Title: "HTTP Basics",
-		Icon:  "fa-coffee",
-	}
-	tmp, err := httputil.DumpRequest(r, true)
-	if err != nil {
-		log.Println("fail to dump request:", err)
-		writeError(w, "Oops, something went wrong... ☹")
-		return
-	}
-	d.Request = string(tmp)
-	err = s.tmpl.ExecuteTemplate(w, "http-basics.html", d)
-	if err != nil {
-		log.Println("fail to execute template:", err)
-		writeError(w, "Oops, something went wrong... ☹")
-		return
+func (s *server) httpBasicsHandler(file, title, icon string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		d := &displayHTTP{
+			Title: title,
+			Icon:  icon,
+		}
+		tmp, err := httputil.DumpRequest(r, true)
+		if err != nil {
+			log.Println("fail to dump request:", err)
+			writeError(w, "Oops, something went wrong... ☹")
+			return
+		}
+		d.Request = string(tmp)
+		err = s.tmpl.ExecuteTemplate(w, file, d)
+		if err != nil {
+			log.Println("fail to execute template:", err)
+			writeError(w, "Oops, something went wrong... ☹")
+			return
+		}
 	}
 }
 
