@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{template "partial/head.html" .}}
+    <style>
+        .cool-color {
+            color: {{.Color}};
+        }
+    </style>
+</head>
+
+<body class="container">
+    {{template "partial/header.html" .}}
+    <div class="row justify-content-md-center mt-2">
+        <p class="col-md-8">
+            Hey there! I did not see you comming. It is {{.Name}}, right? So you have learn about HTTP Post and you want to have a chat about what we can post? Whatever, this is what I want to talk about. <i class="fa fa-smile-o"></i>
+        </p>
+        <p class="col-md-8">For more information go to <a href="https://en.wikipedia.org/wiki/Media_type">Wikipedia</a>.</p>
+    </div>
+    <div class="row justify-content-md-center mt-2">
+        <p class="col-md-8">Below, is the request I received from your browser:</p>
+        <pre class="col-md-8">{{.Request}}</pre>
+    </div>
+</body>
+
+</html>
