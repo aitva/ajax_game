@@ -110,7 +110,8 @@ func (s *server) httpBasicsHandler(file, title, icon string) http.HandlerFunc {
 			Title: title,
 			Icon:  icon,
 		}
-		tmp, err := httputil.DumpRequest(r, true)
+		allow := []string{"Host"}
+		tmp, err := dumpRequest(r, allow, true)
 		if err != nil {
 			log.Println("fail to dump request:", err)
 			writeError(w, "Oops, something went wrong... ☹")
@@ -254,6 +255,7 @@ func (s *server) notFoundHandler(w http.ResponseWriter, r *http.Request) {
 		Title: "404 - Not Found",
 		Icon:  "fa-eye",
 	}
+	w.WriteHeader(http.StatusNotFound)
 	err := s.tmpl.ExecuteTemplate(w, "not-found.html", d)
 	if err != nil {
 		log.Println("fail to execute template:", err)

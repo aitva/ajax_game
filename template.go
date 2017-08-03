@@ -39,7 +39,7 @@ func watchTemplate(folder string) (*fsnotify.Watcher, error) {
 	}
 
 	err = filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
+		if info == nil || !info.IsDir() {
 			return nil
 		}
 		return watcher.Add(path)
