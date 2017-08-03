@@ -12,4 +12,10 @@
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
+
+# Go dep vendor folder
 vendor
+
+# Binary
+ajax_game
+
