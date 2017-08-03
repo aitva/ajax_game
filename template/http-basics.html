@@ -24,7 +24,7 @@
     <div class="col-md-8 offset-md-2 mt-2">
         <p>Below, is the request I received:</p>
         <pre><code class="HTTP">{{.Request}}</code></pre>
-        <p>To continue to the next you will need to make your own HTTP request:</p>
+        <p>To continue to the next you will need to make your own HTTP request to <code>/http-query/</code>:</p>
         <form method="POST" action="/http-parse/">
             <textarea class="form-control code-area" name="request" placeholder="GET /my/url/ HTTP/1.1..."></textarea>
             <input type="submit" class="btn btn-primary" value="Go!">
