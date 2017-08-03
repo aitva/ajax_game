@@ -198,6 +198,7 @@ func (s *server) notFoundHandler(w http.ResponseWriter, r *http.Request) {
 		Title: "404 - Not Found",
 		Icon:  "fa-eye",
 	}
+	w.WriteHeader(http.StatusNotFound)
 	err := s.tmpl.ExecuteTemplate(w, "not-found.html", d)
 	if err != nil {
 		log.Println("fail to execute template:", err)
