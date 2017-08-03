@@ -107,7 +107,8 @@ func (s *server) httpBasicsHandler(file, title, icon string) http.HandlerFunc {
 			Title: title,
 			Icon:  icon,
 		}
-		tmp, err := httputil.DumpRequest(r, true)
+		allow := []string{"Host"}
+		tmp, err := dumpRequest(r, allow, true)
 		if err != nil {
 			log.Println("fail to dump request:", err)
 			writeError(w, "Oops, something went wrong... ☹")
