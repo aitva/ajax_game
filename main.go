@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -37,6 +39,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.indexHandler)
 	mux.HandleFunc("/http-basics/", s.httpBasicsHandler("http-basics.html", "HTTP Basics", "fa-coffee"))
+	mux.HandleFunc("/http-parse/", s.parseHandler)
 	mux.HandleFunc("/http-query/", s.httpBasicsHandler("http-query.html", "HTTP Query", "fa-question"))
 	mux.HandleFunc("/http-post/", s.httpPostHandler)
 	mux.HandleFunc("/http-media/", s.httpMediaHandler)
@@ -116,6 +119,59 @@ func (s *server) httpBasicsHandler(file, title, icon string) http.HandlerFunc {
 		d.Request = string(tmp)
 		s.execTemplate(w, file, d)
 	}
+}
+
+func (s *server) parseHandler(w http.ResponseWriter, r *http.Request) {
+
+	err := r.ParseForm()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "fail to parse form: %q", err)
+		return
+	}
+
+	netcatRequest := r.FormValue("request")
+	if netcatRequest == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "POST variable request empty")
+		return
+	}
+
+	exploded := strings.Split(netcatRequest, " ")
+	method := exploded[0]
+
+	if !strings.HasPrefix(exploded[2], "HTTP/1.0") && !strings.HasPrefix(exploded[2], "HTTP/1.1") {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(w, "Request must be HTTP/1.0 or HTTP/1.1")
+		return
+	}
+
+	newr, err := http.NewRequest(method, "http://localhost:8080"+exploded[1], nil)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "cannot create new request: %q", err)
+		return
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(newr)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "cannot client.Do: %q", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "cannot read body: %q", err)
+		return
+	}
+
+	w.WriteHeader(resp.StatusCode)
+	w.Write(b)
 }
 
 func (s *server) httpPostHandler(w http.ResponseWriter, r *http.Request) {
