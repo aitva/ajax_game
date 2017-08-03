@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -130,7 +129,6 @@ func (s *server) parseHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "fail to parse form: %q", err)
 		return
 	}
-
 	netcatRequest := r.FormValue("request")
 	if netcatRequest == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -139,40 +137,31 @@ func (s *server) parseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	exploded := strings.Split(netcatRequest, " ")
-	method := exploded[0]
 
-	if !strings.HasPrefix(exploded[2], "HTTP/1.0") && !strings.HasPrefix(exploded[2], "HTTP/1.1") {
+	if len(exploded) != 3 {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "Wrong request...")
+		return
+	}
+
+	method := exploded[0]
+	page := exploded[1]
+	version := exploded[2]
+
+	if method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Fprintf(w, "Please use GET method")
+		return
+	}
+
+	if !strings.HasPrefix(version, "HTTP/1.0") && !strings.HasPrefix(version, "HTTP/1.1") {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, "Request must be HTTP/1.0 or HTTP/1.1")
 		return
 	}
 
-	newr, err := http.NewRequest(method, "http://localhost:8080"+exploded[1], nil)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "cannot create new request: %q", err)
-		return
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(newr)
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "cannot client.Do: %q", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "cannot read body: %q", err)
-		return
-	}
-
-	w.WriteHeader(resp.StatusCode)
-	w.Write(b)
+	w.Header().Set("Location", page)
+	w.WriteHeader(http.StatusFound)
 }
 
 func (s *server) httpPostHandler(w http.ResponseWriter, r *http.Request) {
