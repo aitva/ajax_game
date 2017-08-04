@@ -5,9 +5,12 @@
     {{template "partial/head.html" .}}
     <style>
         .cool-color {
-            color: {{.Color}};
+            /* remove VSCode warning */
+            --favorite-color: {{.Color}};
+            color: var(--favorite-color);
         }
-        #editor { 
+        
+        #editor {
             height: 20em;
         }
     </style>
@@ -23,10 +26,8 @@
     </div>
     <div class="row justify-content-md-center mt-2">
         <p class="col-md-8">Below, is the request I received from your browser:</p>
-        <div id="editor" class="col-md-8">function foo(items) {
-            var x = "All this is syntax highlighted";
-            return x;
-        }</div>
+        <div id="editor" class="col-md-8">function foo(items) { var x = "All this is syntax highlighted"; return x; }
+        </div>
     </div>
     <script src="/static/ace-builds-1.2.8/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
     <script>

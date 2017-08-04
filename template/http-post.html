@@ -5,7 +5,9 @@
     {{template "partial/head.html" .}}
     <style>
         .cool-color {
-            color: {{.Color}};
+            /* remove VSCode warning */
+            --favorite-color: {{.Color}};
+            color: var(--favorite-color);
         }
     </style>
 </head>

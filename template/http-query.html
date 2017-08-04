@@ -7,16 +7,19 @@
 
 <body class="container">
     {{template "partial/header.html" .}}
-    <div class="row justify-content-md-center mt-2">
-        <p class="col-md-8">Let's spice things up!! Using just a verb and a path make HTTP looks quite boring. We will add additional information to our request so the server can introduce nuances in its response.</p>
-        <p class="col-md-8">There are two ways to add information to a request: the fist one is the <a href="https://en.wikipedia.org/wiki/Query_string">query string</a> (adding information to the URL) and the second one the request's body (adding information inside the
-            request).
+    <div class="col-md-8 offset-md-2 mt-2">
+        <p>Let's spice things up!! Using just a verb and a path make HTTP looks quite boring. We will add additional information to our request so the server can introduce nuances in its response.</p>
+        <p>There are two ways to add information to a request: the first one is the <a href="https://en.wikipedia.org/wiki/Query_string">query string</a> (adding information to the URL) and the second one the request's body (adding information inside the request).
         </p>
     </div>
-    <div class="row justify-content-md-center mt-2">
-        <p class="col-md-8">Below, is the request I received from your browser:</p>
-        <pre class="col-md-8">{{.Request}}</pre>
-        <p class="col-md-8">For the next request I would like to know your favorite color and your name. I will be waiting for you at <a href="/http-post/">/http-post/</a>. (Add your favorite <code>color</code> and your <code>name</code> to the query string.)</p>
+    <div class="col-md-8 offset-md-2 mt-2">
+        <p>Below, is the request I received:</p>
+        <pre><code class="HTTP">{{.Request}}</code></pre>
+        <p>For the next request I would like to know your favorite color and your name. I will be waiting for you at <code>/http-post/</code> (add your favorite <code>color</code> and your <code>name</code> in a query string):</p>
+        <form method="POST" action="/http-parse/">
+            <textarea class="form-control code-area" name="request" placeholder="GET /my/url/ HTTP/1.1..."></textarea>
+            <input type="submit" class="btn btn-primary" value="Go!">
+        </form>
     </div>
 </body>
 
