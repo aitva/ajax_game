@@ -28,22 +28,81 @@
         <i class="fa fa-bug" style="font-size: 10em;"></i>
     </div>
     <section class="mt-2 col-md-8 offset-md-2">
-        <h2>Welcome</h2>
-        <p>
+        <h2 id="title">Welcome</h2>
+        <p id="text">
             Hey there! I did not see you comming. It is you, right? So you have learn about HTTP Post and you want to have a chat about what we can post? Whatever, this is what I want to talk about. <i class="fa fa-smile-o"></i>
         </p>
     </section>
     <hr>
     <section class="mt-2 col-md-8 offset-md-2">
         <h2>Editor</h2>
-        <form method="POST" action="nojs.html">
+        <div id="alert"></div>
+        <form id="form" method="POST" action="nojs.html">
             <div class="form-group">
                 <label for="request">HTTP Request:</label>
                 <textarea id="request" class="form-control" name="request"></textarea>
             </div>
             <input type="submit" class="btn btn-primary" value="Send" />
         </form>
-    </section> 
+    </section>
+    
+    <script src="js/parser.js"></script>
+    <script>
+        "use strict";
+
+        // data contains the information on the page.
+        let data = {
+            icon: "",
+            objects: [],
+            text: "",
+            title: "",
+        }
+
+        // display displays data on the screen.
+        const display = function() {
+            let h1 = document.getElementById("title");
+            let p = document.getElementById("text");
+            h1.textContent = data.title;
+            text.textContent = data.title;
+        }
+
+        // alert creates a new alert on the page of the given type with the message msg.
+        // The type can be any of: success, info, warning, danger.
+        const alert = function(type, msg) {
+            let alert = document.createElement("div");
+            alert.classList.add("alert", "alert-"+type);
+            alert.setAttribute("role", "alert");
+            alert.innerHTML = msg;
+            
+            let div = document.getElementById("alert");
+            div.appendChild(alert);
+            
+            setTimeout(() => {div.removeChild(alert)}, 2000)
+        }
+
+        let textarea = document.getElementById("request");
+        let form = document.getElementById("form");
+        let p = new Parser();
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            let req = p.parse(textarea.value);
+            fetch(req).catch(function (err) {
+                console.error(err);
+                alert("danger", "fail to send request")
+            }).then(function (res) {
+                if (res.status === 200) {
+                    return res.json();
+                }
+                res.text().then(function (text) {
+                    alert("warning", `<strong>status:</strong> ${res.status}<br/>
+                        <strong>message:</strong> ${text}`);
+                });
+            }).then(function(json) {
+                data = json;
+                display();
+            });
+        })
+    </script>
 </body>
 
 </html>
