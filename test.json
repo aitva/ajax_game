@@ -1,0 +1,20 @@
+//request
+GET /locked HTTP/1.1
+host: test.com
+Use-Object: cle=12345; pioche=3456
+
+//response
+{
+    "img": "123.jpg",
+    "text": "...",
+    "objects":[
+        {
+            "name":"cle",
+            "value":"12345"
+        },
+        {
+            "name": "pioche",
+            "value": "123466787"
+        }
+    ]
+}
