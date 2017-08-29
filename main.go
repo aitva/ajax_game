@@ -57,7 +57,9 @@ func pageHandler(page string) http.Handler {
 			locked = isLocked(meta.Required, usedObjects)
 		}
 
-		content, err := page.Content(locked)
+		name := getName(r)
+
+		content, err := page.Content(name, locked)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -147,4 +149,8 @@ lock:
 	}
 
 	return false
+}
+
+func getName(r *http.Request) string {
+	return r.Header.Get("Name")
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"text/template"
 
 	"gopkg.in/yaml.v2"
 )
@@ -28,7 +29,7 @@ type PageMeta struct {
 // Page represents all informations form a Markdown page
 type Page interface {
 	Meta() (*PageMeta, error)
-	Content(locked bool) (string, error)
+	Content(name string, locked bool) (string, error)
 
 	Parse(r io.Reader) error
 }
@@ -106,9 +107,27 @@ func (p *page) Meta() (*PageMeta, error) {
 	return meta, nil
 }
 
-func (p *page) Content(locked bool) (string, error) {
-	if locked {
+func (p *page) Content(name string, locked bool) (string, error) {
+	/*if locked {
 		return "LOCKED... " + string(p.text), nil
 	}
-	return "UNLOCKED. " + string(p.text), nil
+	return "UNLOCKED. " + string(p.text), nil*/
+
+	data := struct {
+		Name   string
+		Locked bool
+	}{
+		Name:   name,
+		Locked: locked,
+	}
+
+	t := template.Must(template.New("content").Parse(string(p.text)))
+
+	var out bytes.Buffer
+	err := t.Execute(&out, data)
+	if err != nil {
+		return "", err
+	}
+
+	return out.String(), nil
 }

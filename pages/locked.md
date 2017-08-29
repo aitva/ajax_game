@@ -16,4 +16,4 @@ Find the key to advance further and beyond.
 
 Nothing can't stop you. See you in the /lake.
 
-{{ endif }}
+{{ end }}
