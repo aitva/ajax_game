@@ -108,7 +108,7 @@ func (p *page) Meta() (*PageMeta, error) {
 
 func (p *page) Content(locked bool) (string, error) {
 	if locked {
-		return "YOU ARE LOCKED... " + string(p.text), nil
+		return "LOCKED... " + string(p.text), nil
 	}
-	return "YAAAY, UNLOCKED! " + string(p.text), nil
+	return "UNLOCKED. " + string(p.text), nil
 }

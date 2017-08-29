@@ -52,11 +52,9 @@ func pageHandler(page string) http.Handler {
 
 		// If the page requires objects
 		if len(meta.Required) > 0 {
-			locked = true
-
 			// Check if the user has objects to unlock it
 			usedObjects := getObjects(r)
-			locked = !canOpen(meta.Required, usedObjects)
+			locked = isLocked(meta.Required, usedObjects)
 		}
 
 		content, err := page.Content(locked)
@@ -127,16 +125,26 @@ func getObjects(r *http.Request) []*GameObject {
 	return objects
 }
 
-func canOpen(locks, usedObjects []*GameObject) bool {
+func isLocked(locks, usedObjects []*GameObject) bool {
+
+	if len(locks) == 0 {
+		return false
+	}
+
+	if len(usedObjects) == 0 {
+		return true
+	}
+
 lock:
 	for _, lock := range locks {
 		for _, used := range usedObjects {
 			if used.Name == lock.Name && used.Value == lock.Value {
 				continue lock
 			} else {
-				return false
+				return true
 			}
 		}
 	}
-	return true
+
+	return false
 }
