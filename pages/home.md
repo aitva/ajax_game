@@ -1,5 +1,5 @@
 ```
-title="Welcome to the ajax_game"
+title: "Welcome to the ajax_game"
 ```
 
 # Beware...
