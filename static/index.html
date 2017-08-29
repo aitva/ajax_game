@@ -40,7 +40,7 @@
         <form id="form" method="POST" action="nojs.html">
             <div class="form-group">
                 <label for="request">HTTP Request:</label>
-                <textarea id="request" class="form-control" name="request"></textarea>
+                <textarea id="request" class="form-control" name="request">GET /toto HTTP/1.1</textarea>
             </div>
             <input type="submit" class="btn btn-primary" value="Send" />
         </form>
@@ -70,23 +70,31 @@
             // alert creates a new alert on the page of the given type with the message msg.
             // The type can be any of: success, info, warning, danger.
             alert: function(type, msg) {
+                let div = document.getElementById("alert");
+
                 let alert = document.createElement("div");
                 alert.classList.add("alert", "alert-"+type);
                 alert.setAttribute("role", "alert");
-                alert.innerHTML += `<button type="button" class="close" 
-                    data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>`;
                 if (typeof msg === 'object') {
                     let str = "";
                     for (let key of Object.keys(msg)) {
                         str += `<strong>${key}:</strong> ${msg[key]}</br>`;
                     }
-                    alert.innerHTML += str;
+                    alert.innerHTML = str;
                 } else {
                     alert.textContent = msg;
                 }
-                let div = document.getElementById("alert");
+
+                let button = document.createElement("button");
+                button.type = "button";
+                button.classList.add("close");
+                button.dataset.dismiss = "alert";
+                button.innerHTML = "<span>&times;</span>"
+                button.addEventListener("click", function(e) {
+                    div.removeChild(alert);
+                });
+                alert.insertBefore(button, alert.firstElementChild);
+
                 div.appendChild(alert);
             }
         }
