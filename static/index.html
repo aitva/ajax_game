@@ -50,34 +50,44 @@
     <script>
         "use strict";
 
-        // data contains the information on the page.
-        let data = {
-            icon: "",
-            objects: [],
-            text: "",
-            title: "",
-        }
-
-        // display displays data on the screen.
-        const display = function() {
-            let h1 = document.getElementById("title");
-            let p = document.getElementById("text");
-            h1.textContent = data.title;
-            text.textContent = data.title;
-        }
-
-        // alert creates a new alert on the page of the given type with the message msg.
-        // The type can be any of: success, info, warning, danger.
-        const alert = function(type, msg) {
-            let alert = document.createElement("div");
-            alert.classList.add("alert", "alert-"+type);
-            alert.setAttribute("role", "alert");
-            alert.innerHTML = msg;
+        const game = {
+            // data contains the information on the page.
+            data: {
+                icon: "",
+                objects: [],
+                text: "",
+                title: "",
+            },
             
-            let div = document.getElementById("alert");
-            div.appendChild(alert);
-            
-            setTimeout(() => {div.removeChild(alert)}, 2000)
+            // display displays data on the screen.
+            display: function() {
+                let h1 = document.getElementById("title");
+                let p = document.getElementById("text");
+                h1.textContent = this.data.title;
+                text.textContent = this.data.text;
+            },
+
+            // alert creates a new alert on the page of the given type with the message msg.
+            // The type can be any of: success, info, warning, danger.
+            alert: function(type, msg) {
+                let alert = document.createElement("div");
+                alert.classList.add("alert", "alert-"+type);
+                alert.setAttribute("role", "alert");
+                if (typeof msg === 'object') {
+                    for (let key of Object.keys(msg)) {
+                        let p = document.createElement("p");
+                        p.innerHTML = `<strong>${key}:</strong> ${msg[key]}`;
+                        alert.appendChild(p);
+                    }
+                } else {
+                    alert.textContent = msg;
+                }
+                
+                let div = document.getElementById("alert");
+                div.appendChild(alert);
+                
+                setTimeout(() => {div.removeChild(alert)}, 2000)
+            }
         }
 
         let textarea = document.getElementById("request");
@@ -88,18 +98,22 @@
             let req = p.parse(textarea.value);
             fetch(req).catch(function (err) {
                 console.error(err);
-                alert("danger", "fail to send request")
+                game.alert("danger", "fail to send request")
             }).then(function (res) {
                 if (res.status === 200) {
-                    return res.json();
+                    return res.json()
                 }
-                res.text().then(function (text) {
-                    alert("warning", `<strong>status:</strong> ${res.status}<br/>
-                        <strong>message:</strong> ${text}`);
+                return res.text().then(function (text) {
+                    return Promise.reject({
+                        status: res.status,
+                        text: text
+                    });
                 });
             }).then(function(json) {
-                data = json;
-                display();
+                game.data = json;
+                game.display();
+            }).catch(function (err) {
+                game.alert("warning", err);
             });
         })
     </script>
