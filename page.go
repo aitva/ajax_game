@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 // GameObject represents an object found or used by the player
@@ -17,20 +19,21 @@ type GameObject struct {
 
 // PageMeta holds page meta informations parsed from the Markdown pages
 type PageMeta struct {
-	Title      string
-	Required   []*GameObject
-	Discovered []*GameObject
+	Icon       string        `yaml:"icon"`
+	Title      string        `yaml:"title"`
+	Required   []*GameObject `yaml:"required"`
+	Discovered []*GameObject `yaml:"discovered"`
 }
 
 // Page represents all informations form a Markdown page
 type Page interface {
-	Meta() *PageMeta
-	Content() []byte
+	Meta() (*PageMeta, error)
+	Content(locked bool) (string, error)
 
 	Parse(r io.Reader) error
 }
 
-// page implements Page interface
+// page implements the Page interface
 type page struct {
 	frontMatter []byte
 	text        []byte
@@ -39,16 +42,6 @@ type page struct {
 const (
 	frontMatterDelimiter = "```"
 )
-
-func (p *page) Meta() *PageMeta {
-	meta := &PageMeta{}
-	meta.Title = string(p.frontMatter)
-	return meta
-}
-
-func (p *page) Content() string {
-	return string(p.text)
-}
 
 func (p *page) Parse(r io.Reader) error {
 	reader := bufio.NewReader(r)
@@ -100,4 +93,22 @@ func readUntil(r reader, delim []byte) (line []byte, err error) {
 			return line[:len(line)-len(delim)], nil
 		}
 	}
+}
+
+func (p *page) Meta() (*PageMeta, error) {
+	meta := &PageMeta{}
+
+	err := yaml.Unmarshal(p.frontMatter, meta)
+	if err != nil {
+		return nil, err
+	}
+
+	return meta, nil
+}
+
+func (p *page) Content(locked bool) (string, error) {
+	if locked {
+		return "YOU ARE LOCKED... " + string(p.text), nil
+	}
+	return "YAAAY, UNLOCKED! " + string(p.text), nil
 }

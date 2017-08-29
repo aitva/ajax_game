@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gorilla/handlers"
 )
@@ -34,13 +35,61 @@ func main() {
 
 func pageHandler(page string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp, err := parsePage(page)
+
+		page, err := parsePage(page)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+
+		meta, err := page.Meta()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		locked := false
+
+		// If the page requires objects
+		if len(meta.Required) > 0 {
+			locked = true
+
+			// Check if the user has objects to unlock it
+			usedObjects := getObjects(r)
+			locked = !canOpen(meta.Required, usedObjects)
+		}
+
+		content, err := page.Content(locked)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		resp := &jsonResponse{
+			Icon:    meta.Icon,
+			Title:   meta.Title,
+			Objects: meta.Discovered,
+			Text:    content,
+		}
+
 		respond(w, resp)
 	})
+}
+
+func parsePage(pageName string) (Page, error) {
+	f, err := os.Open("pages/" + pageName + ".md")
+	if err != nil {
+		return nil, err
+	}
+
+	page := &page{}
+	err = page.Parse(f)
+	if err != nil {
+		return nil, err
+	}
+
+	return page, nil
 }
 
 func respond(w http.ResponseWriter, resp *jsonResponse) {
@@ -54,19 +103,40 @@ func respond(w http.ResponseWriter, resp *jsonResponse) {
 	w.Write(js)
 }
 
-func parsePage(pageName string) (*jsonResponse, error) {
-	f, err := os.Open("pages/" + pageName + ".md")
-	if err != nil {
-		return nil, err
+func getObjects(r *http.Request) []*GameObject {
+	objects := make([]*GameObject, 0)
+
+	header := r.Header.Get("Use-Object")
+	if header == "" {
+		return objects
 	}
 
-	page := &page{}
-	page.Parse(f)
+	tokens := strings.Split(header, ";")
+	for _, t := range tokens {
+		exploded := strings.Split(t, "=")
+		if len(exploded) != 2 {
+			continue
+		}
+		name := strings.TrimSpace(exploded[0])
+		value := strings.TrimSpace(exploded[1])
 
-	resp := &jsonResponse{
-		Title: page.Meta().Title,
-		Text:  page.Content(),
+		o := &GameObject{name, value}
+		objects = append(objects, o)
 	}
 
-	return resp, nil
+	return objects
+}
+
+func canOpen(locks, usedObjects []*GameObject) bool {
+lock:
+	for _, lock := range locks {
+		for _, used := range usedObjects {
+			if used.Name == lock.Name && used.Value == lock.Value {
+				continue lock
+			} else {
+				return false
+			}
+		}
+	}
+	return true
 }

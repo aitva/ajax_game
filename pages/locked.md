@@ -1,6 +1,7 @@
 ```
-title="The big door"
-required=["key"]
+title: The big door
+required: [{name: key, value: 123}]
+
 ```
 
 {{ if .Locked }}
