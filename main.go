@@ -26,12 +26,11 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", indexHandler)
+	mux.Handle("/", http.FileServer(http.Dir("static")))
+
 	mux.Handle("/home", pageHandler("home"))
 	mux.Handle("/locked/", pageHandler("locked"))
 	mux.Handle("/closet/", pageHandler("closet"))
-
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	logHandler := handlers.LoggingHandler(os.Stdout, mux)
 
