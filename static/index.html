@@ -9,16 +9,13 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
     <link rel="stylesheet" href="css/bootstrap-4.0.0-alpha.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="js/highlight/styles/default.css">
-    <script src="js/highlight/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
     <title>AJAX Game</title>
     <style>
         .cool-color {
             color: red;
         }
-        #editor { 
-            height: 20em;
+        #request {
+            height: 5em;
         }
     </style>
 </head>
@@ -30,27 +27,23 @@
     <div class="text-center mt-3 cool-color">
         <i class="fa fa-bug" style="font-size: 10em;"></i>
     </div>
-    <div class="row justify-content-md-center mt-2">
-        <p class="col-md-8">
+    <section class="mt-2 col-md-8 offset-md-2">
+        <h2>Welcome</h2>
+        <p>
             Hey there! I did not see you comming. It is you, right? So you have learn about HTTP Post and you want to have a chat about what we can post? Whatever, this is what I want to talk about. <i class="fa fa-smile-o"></i>
         </p>
-        <p class="col-md-8">For more information go to <a href="https://en.wikipedia.org/wiki/Media_type">Wikipedia</a>.</p>
-    </div>
-    <div class="row justify-content-md-center mt-2">
-        <p class="col-md-8">Below, is the request I received from your browser:</p>
-        <div id="editor" class="col-md-8">
-function foo(items) {
-    var x = "All this is syntax highlighted";
-    return x;
-}
-        </div>
-    </div>
-    <script src="js/ace-builds-1.2.8/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script>
-        var editor = ace.edit("editor");
-        editor.setTheme("ace/theme/monokai");
-        editor.getSession().setMode("ace/mode/javascript");
-    </script>
+    </section>
+    <hr>
+    <section class="mt-2 col-md-8 offset-md-2">
+        <h2>Editor</h2>
+        <form>
+            <div class="form-group">
+                <label for="request">HTTP Request:</label>
+                <textarea id="request" class="form-control" name="request"></textarea>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Send" />
+        </form>
+    </section>
 </body>
 
 </html>
