@@ -9,6 +9,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
     <link rel="stylesheet" href="css/bootstrap-4.0.0-alpha.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css">
+    <script src="css/bootstrap-4.0.0-alpha.6/js/bootstrap.min.js"></script>
     <title>AJAX Game</title>
     <style>
         .cool-color {
@@ -73,20 +74,21 @@
                 let alert = document.createElement("div");
                 alert.classList.add("alert", "alert-"+type);
                 alert.setAttribute("role", "alert");
+                alert.innerHTML += `<button type="button" class="close" 
+                    data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>`;
                 if (typeof msg === 'object') {
+                    let str = "";
                     for (let key of Object.keys(msg)) {
-                        let p = document.createElement("p");
-                        p.innerHTML = `<strong>${key}:</strong> ${msg[key]}`;
-                        alert.appendChild(p);
+                        str += `<strong>${key}:</strong> ${msg[key]}</br>`;
                     }
+                    alert.innerHTML += str;
                 } else {
                     alert.textContent = msg;
                 }
-                
                 let div = document.getElementById("alert");
                 div.appendChild(alert);
-                
-                setTimeout(() => {div.removeChild(alert)}, 2000)
             }
         }
 
