@@ -9,10 +9,10 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
     <link rel="stylesheet" href="css/bootstrap-4.0.0-alpha.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css">
-    <title>AJAX Game</title>
+    <title>AJAX Game - No JS</title>
     <style>
         .cool-color {
-            color: pink;
+            color: red;
         }
         #request {
             height: 5em;
@@ -22,28 +22,19 @@
 
 <body class="container">
     <header>
-        <h1 class="text-center">AJAX Game</h1>
+        <h1 class="text-center">AJAX Game - No JS</h1>
     </header>
     <div class="text-center mt-3 cool-color">
-        <i class="fa fa-bug" style="font-size: 10em;"></i>
+        <i class="fa fa-free-code-camp" style="font-size: 10em;"></i>
     </div>
     <section class="mt-2 col-md-8 offset-md-2">
         <h2>Welcome</h2>
         <p>
-            Hey there! I did not see you comming. It is you, right? So you have learn about HTTP Post and you want to have a chat about what we can post? Whatever, this is what I want to talk about. <i class="fa fa-smile-o"></i>
+            Woop! No JS for you? No problem, you can play the game using cURL or your favorite language.
+            Web browser and cool display are only for the noobs.
         </p>
+        <p>To continue the game send an HTTP request to <a href="/home">/home</a></p>
     </section>
-    <hr>
-    <section class="mt-2 col-md-8 offset-md-2">
-        <h2>Editor</h2>
-        <form method="POST" action="nojs.html">
-            <div class="form-group">
-                <label for="request">HTTP Request:</label>
-                <textarea id="request" class="form-control" name="request"></textarea>
-            </div>
-            <input type="submit" class="btn btn-primary" value="Send" />
-        </form>
-    </section> 
 </body>
 
 </html>
