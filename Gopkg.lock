@@ -2,26 +2,20 @@
 
 
 [[projects]]
-  name = "github.com/fsnotify/fsnotify"
-  packages = ["."]
-  revision = "629574ca2a5df945712d3079857300b5e4da0236"
-  version = "v1.4.2"
-
-[[projects]]
   name = "github.com/gorilla/handlers"
   packages = ["."]
   revision = "a4043c62cc2329bacda331d33fc908ab11ef0ec3"
   version = "v1.2.1"
 
 [[projects]]
-  branch = "master"
-  name = "golang.org/x/sys"
-  packages = ["unix"]
-  revision = "02a66801d979d706a4b445e24e03916eeaa2a404"
+  branch = "v2"
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "98d7d71573f8521dbc8a0e2ac2c34aaf551b9df2f2c47ae24681ea890bfb19c7"
+  inputs-digest = "70633c6b55604cfcbf594e5efcdaf32293551ff0bec0e109f876fac0c74b723f"
   solver-name = "gps-cdcl"
   solver-version = 1
