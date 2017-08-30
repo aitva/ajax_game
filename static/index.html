@@ -40,7 +40,11 @@
         <form id="form" method="POST" action="nojs.html">
             <div class="form-group">
                 <label for="request">HTTP Request:</label>
-                <textarea id="request" class="form-control" name="request">GET /toto HTTP/1.1</textarea>
+                <textarea id="request" class="form-control" name="request">GET /home HTTP/1.1
+Name: toto
+
+Body
+</textarea>
             </div>
             <input type="submit" class="btn btn-primary" value="Send" />
         </form>
@@ -104,7 +108,15 @@
         let p = new Parser();
         form.addEventListener("submit", function (e) {
             e.preventDefault();
-            let req = p.parse(textarea.value);
+            let div = document.getElementById("alert").innerHTML = "";
+            let req = null;
+            try {
+                req = p.parse(textarea.value);
+            } catch(e) {
+                console.error(e.toString());
+                game.alert("danger", e.toString());
+                return;
+            }
             fetch(req).catch(function (err) {
                 console.error(err);
                 game.alert("danger", "fail to send request")
