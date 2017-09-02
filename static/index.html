@@ -117,24 +117,22 @@ Body
                 game.alert("danger", e.toString());
                 return;
             }
-            fetch(req).catch(function (err) {
-                console.error(err);
-                game.alert("danger", "fail to send request")
-            }).then(function (res) {
+            fetch(req).then(function (res) {
                 if (res.status === 200) {
-                    return res.json()
+                    res.json().then(function(json) {
+                        game.data = json;
+                        game.display();
+                    })
                 }
-                return res.text().then(function (text) {
-                    return Promise.reject({
+                res.text().then(function (text) {
+                    game.alert("warning", {
                         status: res.status,
                         text: text
                     });
                 });
-            }).then(function(json) {
-                game.data = json;
-                game.display();
             }).catch(function (err) {
-                game.alert("warning", err);
+                console.error(err);
+                game.alert("danger", "fail to send request")
             });
         })
     </script>
