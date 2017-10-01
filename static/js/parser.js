@@ -1,5 +1,28 @@
 "use strict";
 
+const Token = function (type, literal) {
+    return Object.freeze({
+        type: type,
+        literal: literal,
+    });
+}
+Token.prototype.ILLEGAL = "ILLEGAL";
+Token.prototype.EOF = "EOF";
+Token.prototype.INDENT = "INDENT";
+Token.prototype.INT = "INT";
+Token.prototype.ASSIGN = ":";
+Token.prototype.SEMICOLON = ";";
+
+const Lexer = function(input) {
+    let that = {
+        input: input,
+        position: 0,
+        readPosition: 0,
+        ch: 0
+    }
+    return Object.freeze(that);
+}
+
 const Parser = function() {
     let that = {};
     let allSpace = /^\s+$/;

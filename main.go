@@ -103,6 +103,8 @@ func respond(w http.ResponseWriter, resp *jsonResponse) {
 	w.Write(js)
 }
 
+// getObjects extracts object from a request.
+// It expects object to be in the form: key=value; key2=value2; ...
 func getObjects(r *http.Request) []*GameObject {
 	objects := make([]*GameObject, 0)
 

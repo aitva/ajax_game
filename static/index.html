@@ -41,10 +41,7 @@
             <div class="form-group">
                 <label for="request">HTTP Request:</label>
                 <textarea id="request" class="form-control" name="request">GET /home HTTP/1.1
-Name: toto
-
-Body
-</textarea>
+Name: toto</textarea>
             </div>
             <input type="submit" class="btn btn-primary" value="Send" />
         </form>
@@ -123,6 +120,7 @@ Body
                         game.data = json;
                         game.display();
                     })
+                    return;
                 }
                 res.text().then(function (text) {
                     game.alert("warning", {
