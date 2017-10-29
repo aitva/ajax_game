@@ -21,10 +21,10 @@ type GameObject struct {
 
 // PageMeta holds page meta informations parsed from the Markdown pages
 type PageMeta struct {
-	Icon       string        `yaml:"icon"`
-	Title      string        `yaml:"title"`
-	Required   []*GameObject `yaml:"required"`
-	Discovered []*GameObject `yaml:"discovered"`
+	Icon       string       `yaml:"icon"`
+	Title      string       `yaml:"title"`
+	Required   []GameObject `yaml:"required"`
+	Discovered []GameObject `yaml:"discovered"`
 }
 
 // Page represents all informations form a Markdown page

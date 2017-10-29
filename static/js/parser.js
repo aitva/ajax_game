@@ -1,10 +1,10 @@
 "use strict";
 
 const Token = function (type, literal) {
-    return Object.freeze({
+    return {
         type: type,
         literal: literal,
-    });
+    };
 }
 Token.prototype.ILLEGAL = "ILLEGAL";
 Token.prototype.EOF = "EOF";
@@ -20,7 +20,7 @@ const Lexer = function(input) {
         readPosition: 0,
         ch: 0
     }
-    return Object.freeze(that);
+    return that;
 }
 
 const Parser = function() {
@@ -64,5 +64,5 @@ const Parser = function() {
         return new Request(url, req);
     }
 
-    return Object.freeze(that);
+    return that;
 };

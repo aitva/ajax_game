@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -13,22 +14,33 @@ import (
 type jsonResponse struct {
 	Title   string        `json:"title"`
 	Icon    string        `json:"icon"`
-	Text    string        `json:"text"`
-	Objects []*GameObject `json:"objects"`
+	Text    template.HTML `json:"text"`
+	Objects []GameObject  `json:"objects"`
+}
+
+type gameServer struct {
+	tmpls *template.Template
 }
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	mux := http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.Dir("static")))
+	tmpls, err := template.ParseGlob("template/*.html")
+	if err != nil {
+		log.Fatal("fail to parse template:", err)
+	}
+	server := gameServer{
+		tmpls: tmpls,
+	}
 
-	mux.Handle("/home", pageHandler("home"))
-	mux.Handle("/locked/", pageHandler("locked"))
-	mux.Handle("/closet/", pageHandler("closet"))
-	mux.Handle("/name/", pageHandler("name"))
-	mux.Handle("/settings/", pageHandler("settings"))
-	mux.Handle("/super8/", pageHandler("super8"))
+	mux := http.NewServeMux()
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+	mux.Handle("/", server.pageHandler("index"))
+	mux.Handle("/freedom/", server.pageHandler("freedom"))
+	mux.Handle("/name/", server.pageHandler("name"))
+	mux.Handle("/settings/", server.pageHandler("settings"))
+	mux.Handle("/super8/", server.pageHandler("super8"))
 
 	logHandler := handlers.LoggingHandler(os.Stdout, mux)
 
@@ -36,7 +48,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", logHandler))
 }
 
-func pageHandler(page string) http.Handler {
+func (s *gameServer) pageHandler(page string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		page, err := parsePage(page)
@@ -63,20 +75,27 @@ func pageHandler(page string) http.Handler {
 		name := getName(r)
 
 		content, err := page.Content(name, locked)
-
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		resp := &jsonResponse{
+		resp := jsonResponse{
 			Icon:    meta.Icon,
 			Title:   meta.Title,
 			Objects: meta.Discovered,
-			Text:    content,
+			Text:    template.HTML(content),
 		}
-
-		respond(w, resp)
+		if r.Header.Get("Accept") == "application/json" {
+			respond(w, resp)
+			return
+		}
+		err = s.tmpls.ExecuteTemplate(w, "index.html", resp)
+		if err != nil {
+			log.Println("fail to execute template:", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	})
 }
 
@@ -95,7 +114,7 @@ func parsePage(pageName string) (Page, error) {
 	return page, nil
 }
 
-func respond(w http.ResponseWriter, resp *jsonResponse) {
+func respond(w http.ResponseWriter, resp jsonResponse) {
 	js, err := json.Marshal(resp)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -108,8 +127,8 @@ func respond(w http.ResponseWriter, resp *jsonResponse) {
 
 // getObjects extracts object from a request.
 // It expects object to be in the form: key=value; key2=value2; ...
-func getObjects(r *http.Request) []*GameObject {
-	objects := make([]*GameObject, 0)
+func getObjects(r *http.Request) []GameObject {
+	objects := make([]GameObject, 0)
 
 	header := r.Header.Get("Use-Object")
 	if header == "" {
@@ -125,14 +144,14 @@ func getObjects(r *http.Request) []*GameObject {
 		name := strings.TrimSpace(exploded[0])
 		value := strings.TrimSpace(exploded[1])
 
-		o := &GameObject{name, value}
+		o := GameObject{name, value}
 		objects = append(objects, o)
 	}
 
 	return objects
 }
 
-func isLocked(locks, usedObjects []*GameObject) bool {
+func isLocked(locks, usedObjects []GameObject) bool {
 
 	if len(locks) == 0 {
 		return false

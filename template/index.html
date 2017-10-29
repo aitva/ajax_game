@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
-    <link rel="stylesheet" href="css/bootstrap-4.0.0-alpha.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png">
+    <link rel="stylesheet" href="/static/css/bootstrap-4.0.0-alpha.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome-4.7.0/css/font-awesome.min.css">
     <title>HTTP H09909</title>
     <style>
         .cool-color {
@@ -28,10 +28,8 @@
         <i class="fa fa-bug" style="font-size: 10em;"></i>
     </div>
     <section class="mt-2 col-md-8 offset-md-2">
-        <h2 id="title">Welcome</h2>
-        <p id="text">
-            Hey there! I did not see you comming. It is you, right? So you have learn about HTTP Post and you want to have a chat about what we can post? Whatever, this is what I want to talk about. <i class="fa fa-smile-o"></i>
-        </p>
+        <h2 id="title">{{.Title}}</h2>
+        <p id="text">{{.Text}}</p>
     </section>
     <hr>
     <section class="mt-2 col-md-8 offset-md-2">
@@ -47,7 +45,8 @@ Name: toto</textarea>
         </form>
     </section>
     
-    <script src="js/parser.js"></script>
+    <script src="/static/js/parser.js"></script>
+    <script src="/static/js/notif.js"></script>
     <script>
         "use strict";
 
@@ -67,37 +66,6 @@ Name: toto</textarea>
                 h1.textContent = this.data.title;
                 text.innerHTML = this.data.text;
             },
-
-            // alert creates a new alert on the page of the given type with the message msg.
-            // The type can be any of: success, info, warning, danger.
-            alert: function(type, msg) {
-                let div = document.getElementById("alert");
-
-                let alert = document.createElement("div");
-                alert.classList.add("alert", "alert-"+type);
-                alert.setAttribute("role", "alert");
-                if (typeof msg === 'object') {
-                    let str = "";
-                    for (let key of Object.keys(msg)) {
-                        str += `<strong>${key}:</strong> ${msg[key]}</br>`;
-                    }
-                    alert.innerHTML = str;
-                } else {
-                    alert.textContent = msg;
-                }
-
-                let button = document.createElement("button");
-                button.type = "button";
-                button.classList.add("close");
-                button.dataset.dismiss = "alert";
-                button.innerHTML = "<span>&times;</span>"
-                button.addEventListener("click", function(e) {
-                    div.removeChild(alert);
-                });
-                alert.insertBefore(button, alert.firstElementChild);
-
-                div.appendChild(alert);
-            }
         }
 
         let textarea = document.getElementById("request");
@@ -114,6 +82,7 @@ Name: toto</textarea>
                 game.alert("danger", e.toString());
                 return;
             }
+            req.headers.set("Accept", "application/json");
             fetch(req).then(function (res) {
                 if (res.status === 200) {
                     res.json().then(function(json) {
@@ -123,10 +92,11 @@ Name: toto</textarea>
                     return;
                 }
                 res.text().then(function (text) {
-                    game.alert("warning", {
+                    let notif = Notif("warning", {
                         status: res.status,
                         text: text
                     });
+                    notif.render(div)
                 });
             }).catch(function (err) {
                 console.error(err);
