@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
     <link rel="stylesheet" href="css/bootstrap-4.0.0-alpha.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/font-awesome-4.7.0/css/font-awesome.min.css">
-    <title>AJAX Game</title>
+    <title>HTTP H09909</title>
     <style>
         .cool-color {
             color: pink;
@@ -22,7 +22,7 @@
 
 <body class="container">
     <header>
-        <h1 class="text-center">AJAX Game</h1>
+        <h1 class="text-center">HTTP H09909</h1>
     </header>
     <div class="text-center mt-3 cool-color">
         <i class="fa fa-bug" style="font-size: 10em;"></i>
@@ -65,7 +65,7 @@ Name: toto</textarea>
                 let h1 = document.getElementById("title");
                 let p = document.getElementById("text");
                 h1.textContent = this.data.title;
-                text.textContent = this.data.text;
+                text.innerHTML = this.data.text;
             },
 
             // alert creates a new alert on the page of the given type with the message msg.

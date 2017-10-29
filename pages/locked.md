@@ -1,6 +1,6 @@
 ```
 title: The big door
-required: [{name: key, value: 123}]
+required: [{name: key, value: silver}]
 
 ```
 

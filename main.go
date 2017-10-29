@@ -26,6 +26,9 @@ func main() {
 	mux.Handle("/home", pageHandler("home"))
 	mux.Handle("/locked/", pageHandler("locked"))
 	mux.Handle("/closet/", pageHandler("closet"))
+	mux.Handle("/name/", pageHandler("name"))
+	mux.Handle("/settings/", pageHandler("settings"))
+	mux.Handle("/super8/", pageHandler("super8"))
 
 	logHandler := handlers.LoggingHandler(os.Stdout, mux)
 

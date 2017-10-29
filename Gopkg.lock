@@ -8,6 +8,18 @@
   version = "v1.2.1"
 
 [[projects]]
+  name = "github.com/russross/blackfriday"
+  packages = ["."]
+  revision = "cadec560ec52d93835bf2f15bd794700d3a2473b"
+  version = "v2.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/shurcooL/sanitized_anchor_name"
+  packages = ["."]
+  revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
+
+[[projects]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -16,6 +28,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "70633c6b55604cfcbf594e5efcdaf32293551ff0bec0e109f876fac0c74b723f"
+  inputs-digest = "882b79cce3ed0b0258b99c97dcb6b35fd87d3a88edbe21f4b7e438708e8478e8"
   solver-name = "gps-cdcl"
   solver-version = 1

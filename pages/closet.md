@@ -1,6 +1,6 @@
 ```
 title: You found yourself in the closet
-discovered: [{name: key, value: 123}, {name: pickaxe, value: abc123xyz}]
+discovered: [{name: key, value: silver}, {name: pickaxe, value: abc123xyz}]
 ```
 
 # What is this?

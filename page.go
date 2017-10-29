@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"text/template"
 
+	"github.com/russross/blackfriday"
 	"gopkg.in/yaml.v2"
 )
 
@@ -108,11 +109,6 @@ func (p *page) Meta() (*PageMeta, error) {
 }
 
 func (p *page) Content(name string, locked bool) (string, error) {
-	/*if locked {
-		return "LOCKED... " + string(p.text), nil
-	}
-	return "UNLOCKED. " + string(p.text), nil*/
-
 	data := struct {
 		Name   string
 		Locked bool
@@ -129,5 +125,6 @@ func (p *page) Content(name string, locked bool) (string, error) {
 		return "", err
 	}
 
-	return out.String(), nil
+	str := blackfriday.Run(out.Bytes())
+	return string(str), nil
 }
