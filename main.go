@@ -15,6 +15,7 @@ type jsonResponse struct {
 	Title   string        `json:"title"`
 	Icon    string        `json:"icon"`
 	Text    template.HTML `json:"text"`
+	Editor  bool          `json:"editor"`
 	Objects []GameObject  `json:"objects"`
 }
 
@@ -83,6 +84,7 @@ func (s *gameServer) pageHandler(page string) http.Handler {
 		resp := jsonResponse{
 			Icon:    meta.Icon,
 			Title:   meta.Title,
+			Editor:  meta.Editor,
 			Objects: meta.Discovered,
 			Text:    template.HTML(content),
 		}

@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png">
     <link rel="stylesheet" href="/static/css/bootstrap-4.0.0-alpha.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/font-awesome-4.7.0/css/font-awesome.min.css">
-    <title>HTTP H09909</title>
+    <title>HTTP Horror</title>
     <style>
         .cool-color {
             color: pink;
@@ -22,7 +22,7 @@
 
 <body class="container">
     <header>
-        <h1 class="text-center">HTTP H09909</h1>
+        <h1 class="text-center">H77P H02202</h1>
     </header>
     <div class="text-center mt-3 cool-color">
         <i class="fa fa-bug" style="font-size: 10em;"></i>
@@ -31,6 +31,7 @@
         <h2 id="title">{{.Title}}</h2>
         <p id="text">{{.Text}}</p>
     </section>
+    {{if .Editor}}
     <hr>
     <section class="mt-2 col-md-8 offset-md-2">
         <h2>Editor</h2>
@@ -104,6 +105,7 @@ Name: toto</textarea>
             });
         })
     </script>
+    {{end}}
 </body>
 
 </html>

@@ -23,6 +23,7 @@ type GameObject struct {
 type PageMeta struct {
 	Icon       string       `yaml:"icon"`
 	Title      string       `yaml:"title"`
+	Editor     bool         `yaml:"editor"`
 	Required   []GameObject `yaml:"required"`
 	Discovered []GameObject `yaml:"discovered"`
 }
