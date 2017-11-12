@@ -2,42 +2,34 @@ package main
 
 import (
 	"encoding/json"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 
+	"github.com/aitva/ajax_game/lib/template"
 	"github.com/gorilla/handlers"
 )
-
-type jsonResponse struct {
-	Title   string        `json:"title"`
-	Icon    string        `json:"icon"`
-	Text    template.HTML `json:"text"`
-	Editor  bool          `json:"editor"`
-	Objects []GameObject  `json:"objects"`
-}
-
-type gameServer struct {
-	tmpls *template.Template
-}
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	tmpls, err := template.ParseGlob("template/*.html")
+	tmpls, err := template.New("template", ".html")
 	if err != nil {
 		log.Fatal("fail to parse template:", err)
 	}
-	server := gameServer{
+	err = tmpls.Watch()
+	if err != nil {
+		log.Fatal("fail to watch template:", err)
+	}
+	server := GameServer{
 		tmpls: tmpls,
 	}
 
 	mux := http.NewServeMux()
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	mux.Handle("/", server.pageHandler("index"))
+	mux.HandleFunc("/", server.mainHandler)
 	mux.Handle("/freedom/", server.pageHandler("freedom"))
 	mux.Handle("/name/", server.pageHandler("name"))
 	mux.Handle("/settings/", server.pageHandler("settings"))
@@ -49,8 +41,52 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", logHandler))
 }
 
-func (s *gameServer) pageHandler(page string) http.Handler {
+// PageView contains mandatory data to render a page.
+type PageView struct {
+	Title   string        `json:"title"`
+	Icon    string        `json:"icon"`
+	Text    template.HTML `json:"text"`
+	Editor  bool          `json:"editor"`
+	Objects []GameObject  `json:"objects"`
+}
+
+// GameServer represents the main game server.
+type GameServer struct {
+	tmpls *template.Template
+}
+
+func (s *GameServer) executeJSON(w http.ResponseWriter, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(data)
+	if err != nil {
+		log.Println("fail to execute JSON:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *GameServer) executeTemplate(w http.ResponseWriter, name string, data interface{}) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	err := s.tmpls.ExecuteTemplate(w, name, data)
+	if err != nil {
+		log.Println("fail to execute template:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (s *GameServer) mainHandler(w http.ResponseWriter, r *http.Request) {
+	name := "index"
+	if r.URL.Path != "/" {
+		name = "404"
+	}
+	s.executeTemplate(w, name, nil)
+}
+
+func (s *GameServer) pageHandler(page string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/"+page+"/" {
+			s.executeTemplate(w, "404", nil)
+			return
+		}
 
 		page, err := parsePage(page)
 		if err != nil {
@@ -81,7 +117,7 @@ func (s *gameServer) pageHandler(page string) http.Handler {
 			return
 		}
 
-		resp := jsonResponse{
+		resp := PageView{
 			Icon:    meta.Icon,
 			Title:   meta.Title,
 			Editor:  meta.Editor,
@@ -89,15 +125,10 @@ func (s *gameServer) pageHandler(page string) http.Handler {
 			Text:    template.HTML(content),
 		}
 		if r.Header.Get("Accept") == "application/json" {
-			respond(w, resp)
+			s.executeJSON(w, resp)
 			return
 		}
-		err = s.tmpls.ExecuteTemplate(w, "index.html", resp)
-		if err != nil {
-			log.Println("fail to execute template:", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		s.executeTemplate(w, "page", resp)
 	})
 }
 
@@ -114,17 +145,6 @@ func parsePage(pageName string) (Page, error) {
 	}
 
 	return page, nil
-}
-
-func respond(w http.ResponseWriter, resp jsonResponse) {
-	js, err := json.Marshal(resp)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
 }
 
 // getObjects extracts object from a request.
