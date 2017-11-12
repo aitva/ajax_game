@@ -1,0 +1,21 @@
+body {
+    color: white;
+    background-color: black;
+}
+
+a {
+    color: lightblue;
+}
+
+a:hover {
+    color:lightseagreen;
+}
+
+.container {
+    margin: 0 auto;
+}
+
+.text-centered {
+    text-align: center;
+}
+

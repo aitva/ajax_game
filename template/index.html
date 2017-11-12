@@ -5,107 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png">
-    <link rel="stylesheet" href="/static/css/bootstrap-4.0.0-alpha.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/style.css">
     <title>HTTP Horror</title>
-    <style>
-        .cool-color {
-            color: pink;
-        }
-        #request {
-            height: 5em;
-        }
-    </style>
 </head>
 
-<body class="container">
-    <header>
-        <h1 class="text-center">H77P H02202</h1>
+<body>
+    <header class="container">
+        <h1 class="text-centered">H77P H02202</h1>
     </header>
-    <div class="text-center mt-3 cool-color">
-        <i class="fa fa-bug" style="font-size: 10em;"></i>
+    <div class="container">
+        <img src="" alt="">
     </div>
-    <section class="mt-2 col-md-8 offset-md-2">
-        <h2 id="title">{{.Title}}</h2>
-        <p id="text">{{.Text}}</p>
-    </section>
-    {{if .Editor}}
-    <hr>
-    <section class="mt-2 col-md-8 offset-md-2">
-        <h2>Editor</h2>
-        <div id="alert"></div>
-        <form id="form" method="POST" action="nojs.html">
-            <div class="form-group">
-                <label for="request">HTTP Request:</label>
-                <textarea id="request" class="form-control" name="request">GET /home HTTP/1.1
-Name: toto</textarea>
-            </div>
-            <input type="submit" class="btn btn-primary" value="Send" />
-        </form>
-    </section>
-    
-    <script src="/static/js/parser.js"></script>
-    <script src="/static/js/notif.js"></script>
-    <script>
-        "use strict";
-
-        const game = {
-            // data contains the information on the page.
-            data: {
-                icon: "",
-                objects: [],
-                text: "",
-                title: "",
-            },
-            
-            // display displays data on the screen.
-            display: function() {
-                let h1 = document.getElementById("title");
-                let p = document.getElementById("text");
-                h1.textContent = this.data.title;
-                text.innerHTML = this.data.text;
-            },
-        }
-
-        let textarea = document.getElementById("request");
-        let form = document.getElementById("form");
-        let p = new Parser();
-        form.addEventListener("submit", function (e) {
-            e.preventDefault();
-            let div = document.getElementById("alert").innerHTML = "";
-            let req = null;
-            try {
-                req = p.parse(textarea.value);
-            } catch(e) {
-                console.error(e.toString());
-                game.alert("danger", e.toString());
-                return;
-            }
-            req.headers.set("Accept", "application/json");
-            fetch(req).then(function (res) {
-                if (res.status === 200) {
-                    res.json().then(function(json) {
-                        game.data = json;
-                        game.display();
-                    })
-                    return;
-                }
-                res.text().then(function (text) {
-                    let notif = Notif("warning", {
-                        status: res.status,
-                        text: text
-                    });
-                    notif.render(div)
-                });
-            }).catch(function (err) {
-                console.error(err);
-                game.alert("danger", "fail to send request")
-            });
-        })
-    </script>
-    {{end}}
+    <article class="container">
+        <h2>{{.Title}}</h2>
+        <section>{{.Text}}</section>
+    </article>
 </body>
 
 </html>
